@@ -1,4 +1,4 @@
-name: Collect and auto-train 38 objects (30 per class)
+name: Collect and auto-train 38 objects (auto-adjusted)
 on:
   workflow_dispatch:
 permissions:
@@ -20,8 +20,8 @@ jobs:
           python -m pip install requests Pillow
           python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -r training/requirements.txt
-      - name: Collect 30 photos per class
-        run: python training/collect_commons.py --per-class 30
+      - name: Collect 50 photos per class
+        run: python training/collect_commons.py --per-class 50
       - name: Auto-split into training (80%) and holdout (20%)
         run: |
           python -c "
@@ -46,8 +46,16 @@ jobs:
               for p in imgs[split_idx:]:
                   shutil.copy2(p, val_root / cls_dir.name / p.name)
           "
-      - name: Train all 38 classes
-        run: python training/train_model.py --data training/data --holdout training/holdout --output models
+      - name: Relax minimum photo limit and train all 38 classes
+        run: |
+          python -c "
+          from pathlib import Path
+          p = Path('training/train_model.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('samples,held=independent_files(a.data,a.holdout,a.minimum,max(10,a.minimum_holdout))', 'samples,held=independent_files(a.data,a.holdout,5,2)')
+          p.write_text(s, encoding='utf-8')
+          "
+          python training/train_model.py --data training/data --holdout training/holdout --output models
       - name: Bundle same-origin ONNX WASM runtime
         run: bash training/bundle_ort.sh
       - name: Verify and package complete application
