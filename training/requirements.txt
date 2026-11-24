@@ -1,0 +1,8 @@
+# Used on developer/CI training machine only; NOT installed on Whalebooks.
+requests>=2.31,<3
+Pillow>=10,<13
+numpy>=1.26,<3
+torch>=2.3,<3
+torchvision>=0.18,<1
+onnx>=1.16,<2
+onnxruntime>=1.17,<2

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="주황색 삼각형 라바콘">
+ <defs><linearGradient id="cone" x1="0" x2="1"><stop stop-color="#bf4914"/><stop offset=".35" stop-color="#ff941c"/><stop offset=".74" stop-color="#ffb23d"/><stop offset="1" stop-color="#d65912"/></linearGradient><linearGradient id="base" x1="0" x2="1"><stop stop-color="#8e3410"/><stop offset=".45" stop-color="#f87b1d"/><stop offset="1" stop-color="#8d320e"/></linearGradient></defs>
+ <ellipse cx="130" cy="238" rx="109" ry="12" fill="#1e1c37" opacity=".18"/>
+ <path d="M105 22Q110 8 118 8H132Q140 8 146 22L196 213H55Z" fill="url(#cone)" stroke="#b44b13" stroke-width="6" stroke-linejoin="round"/>
+ <path d="M93 73H158L168 110H83Z" fill="#fffaf1" stroke="#d8dce0" stroke-width="2"/><path d="M75 145H177L188 181H65Z" fill="#fffaf1" stroke="#d8dce0" stroke-width="2"/>
+ <path d="M43 212L212 212L243 232Q247 238 239 241H17Q8 238 15 232Z" fill="url(#base)" stroke="#9f3b0c" stroke-width="6" stroke-linejoin="round"/>
+ <path d="M106 24L61 207" stroke="#ffe19a" stroke-width="7" stroke-linecap="round" opacity=".28"/>
+ </svg>

@@ -1,0 +1,57 @@
+{
+  "asset": "assets/robot_atlas.webp",
+  "frameWidth": 800,
+  "frameHeight": 889,
+  "columns": 3,
+  "rows": 2,
+  "frames": {
+    "idle": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 889,
+      "column": 0,
+      "row": 0
+    },
+    "talk": {
+      "x": 800,
+      "y": 0,
+      "width": 800,
+      "height": 889,
+      "column": 1,
+      "row": 0
+    },
+    "think": {
+      "x": 1600,
+      "y": 0,
+      "width": 800,
+      "height": 889,
+      "column": 2,
+      "row": 0
+    },
+    "search": {
+      "x": 0,
+      "y": 889,
+      "width": 800,
+      "height": 889,
+      "column": 0,
+      "row": 1
+    },
+    "success": {
+      "x": 800,
+      "y": 889,
+      "width": 800,
+      "height": 889,
+      "column": 1,
+      "row": 1
+    },
+    "fail": {
+      "x": 1600,
+      "y": 889,
+      "width": 800,
+      "height": 889,
+      "column": 2,
+      "row": 1
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "pencil": ["pencil stationery", "wooden pencil on desk", "colored pencils"],
+  "pen": ["ballpoint pen", "writing pen stationery"],
+  "eraser": ["rubber eraser stationery", "pencil eraser"],
+  "a4paper": ["white A4 paper sheet", "printer paper sheets"],
+  "bottle": ["water bottle", "reusable water bottle", "plastic drinking bottle"],
+  "box": ["cardboard box", "empty cardboard carton"],
+  "jump_rope": ["skipping rope", "jump rope handles", "exercise jump rope", "coiled skipping rope"],
+  "basket": ["plastic basket", "woven basket", "shopping basket"],
+  "sports ball": ["soccer ball", "basketball", "sports balls"],
+  "shuttlecock": ["badminton shuttlecock", "shuttlecock cork feather"],
+  "traffic_cone": ["orange traffic cone", "road safety cone", "training traffic cone"],
+  "__background__": ["empty school desk", "empty classroom wall", "charging cable on table", "rope on desk", "school classroom floor"]
+}
