@@ -1,12 +1,20 @@
-name: Collect and auto-train 38 objects (strict 80 per class)
+name: Collect, train 80 per class, and auto-deploy to Pages
 on:
   workflow_dispatch:
 permissions:
   contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 jobs:
-  collect-and-train:
+  collect-train-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,7 +46,6 @@ jobs:
               cls_dir.mkdir(parents=True, exist_ok=True)
               existing = [p for p in cls_dir.iterdir() if p.is_file() and p.suffix.lower() in {'.jpg', '.jpeg', '.png', '.webp'}]
               if len(existing) >= 95:
-                  print(f"[SKIP] {label}: already has {len(existing)}")
                   continue
 
               need = 110 - len(existing)
@@ -48,7 +55,6 @@ jobs:
                   shutil.rmtree(tmp_dir)
               tmp_dir.mkdir(parents=True, exist_ok=True)
 
-              print(f"[CRAWL] {label} (current={len(existing)}, fetching={need}, query='{query}')", flush=True)
               try:
                   crawler = BingImageCrawler(
                       feeder_threads=1,
@@ -94,7 +100,6 @@ jobs:
               (val_root / label).mkdir(parents=True, exist_ok=True)
               cls_dir = src_root / label
               if not cls_dir.is_dir():
-                  print(f"{label}: train=0, holdout=0 (missing)")
                   continue
               imgs = []
               for p in sorted(cls_dir.iterdir()):
@@ -119,10 +124,7 @@ jobs:
 
               random.shuffle(imgs)
               imgs = imgs[:80]
-              if len(imgs) >= 2:
-                  split_idx = max(1, min(len(imgs) - 1, int(len(imgs) * 0.8)))
-              else:
-                  split_idx = len(imgs)
+              split_idx = max(1, min(len(imgs) - 1, int(len(imgs) * 0.8))) if len(imgs) >= 2 else len(imgs)
 
               for p in imgs[:split_idx]:
                   shutil.copy2(p, train_root / label / p.name)
@@ -153,7 +155,7 @@ jobs:
           python training/train_model.py --data training/data --holdout training/holdout --output models
       - name: Bundle same-origin ONNX WASM runtime
         run: bash training/bundle_ort.sh
-      - name: Verify and package complete application
+      - name: Package and prepare site directory
         run: |
           python - << 'EOF'
           import re
@@ -164,9 +166,14 @@ jobs:
           p.write_text(s, encoding='utf-8')
           EOF
           python training/package_release.py
-      - uses: actions/upload-artifact@v4
+          mkdir -p _site
+          unzip -q AI_Object_Detective_validated_38.zip -d _site
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: AI-Object-Detective-validated-38
-          path: AI_Object_Detective_validated_38.zip
-          if-no-files-found: error
-          retention-days: 14
+          path: '_site'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
