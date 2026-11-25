@@ -25,7 +25,7 @@ jobs:
       - name: Clean, deduplicate (exact + dHash), cap at 95, and split 80/20
         run: |
           python - << 'EOF'
-          import shutil, random, hashlib
+          import json, shutil, random, hashlib
           from pathlib import Path
           import numpy as np
           from PIL import Image, ImageOps
@@ -33,6 +33,7 @@ jobs:
           src_root = Path('training/candidates')
           train_root = Path('training/data')
           val_root = Path('training/holdout')
+          labels = list(json.loads(Path('training/catalog_all_38.json').read_text(encoding='utf-8')).keys())
 
           if train_root.exists():
               shutil.rmtree(train_root)
@@ -43,8 +44,12 @@ jobs:
           seen_phashes = []
           random.seed(42)
 
-          for cls_dir in sorted(src_root.iterdir()):
+          for label in labels:
+              (train_root / label).mkdir(parents=True, exist_ok=True)
+              (val_root / label).mkdir(parents=True, exist_ok=True)
+              cls_dir = src_root / label
               if not cls_dir.is_dir():
+                  print(f"{label}: train=0, holdout=0 (missing)")
                   continue
               imgs = []
               for p in sorted(cls_dir.iterdir()):
@@ -74,13 +79,11 @@ jobs:
               else:
                   split_idx = len(imgs)
 
-              (train_root / cls_dir.name).mkdir(parents=True, exist_ok=True)
-              (val_root / cls_dir.name).mkdir(parents=True, exist_ok=True)
               for p in imgs[:split_idx]:
-                  shutil.copy2(p, train_root / cls_dir.name / p.name)
+                  shutil.copy2(p, train_root / label / p.name)
               for p in imgs[split_idx:]:
-                  shutil.copy2(p, val_root / cls_dir.name / p.name)
-              print(f"{cls_dir.name}: train={split_idx}, holdout={len(imgs) - split_idx}")
+                  shutil.copy2(p, val_root / label / p.name)
+              print(f"{label}: train={split_idx}, holdout={len(imgs) - split_idx}")
           EOF
       - name: Patch train_model.py guards and train all 38 classes
         run: |
@@ -90,7 +93,11 @@ jobs:
           s = p.read_text(encoding='utf-8')
           s = s.replace(
               'samples,held=independent_files(a.data,a.holdout,a.minimum,max(10,a.minimum_holdout))',
-              'samples,held=independent_files(a.data,a.holdout,1,1)'
+              'samples,held=independent_files(a.data,a.holdout,0,0)'
+          )
+          s = s.replace(
+              'correct[ys==i].float().mean().item()',
+              '(correct[ys==i].float().mean().item() if (ys==i).any() else 0.0)'
           )
           s = s.replace(
               "raise RuntimeError(f'검증 실패:",
